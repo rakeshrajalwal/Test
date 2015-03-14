@@ -1,0 +1,135 @@
+<html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="{{STATIC_URL|default:'/static/'}}css/bootstrap.min.css">
+  <script src="{{STATIC_URL|default:'/static/'}}js/jquery.min.js"></script>
+  <script src="{{STATIC_URL|default:'/static/'}}js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<br>
+<ul class="nav nav-tabs" role="tablist">
+        <li><a href="/classic_models">Home</a></li>
+        <li><a href="/classic_models/groups">Groups</a></li>
+        <li><a href="/classic_models/campaigns">Campaigns</a></li>
+        <li class="active"><a>Campaigns for Groups</a></li>        
+      </ul>
+<br>
+<br>
+<form name="myform" id="myform" method="post">
+	<textarea id="dates" name="dates" style="display: none;" ></textarea>
+	<div style="padding-left: 5mm;">
+	SelectDate:
+		<input type="date" id="start_date" name="start_date" onchange="myfunc()" value= {{date1}} required="required">
+	<br><br><br>
+	</div>
+</form>
+<br>
+<table align="center" style="width:60%" border='0' class="table table-bordered table-condensed">
+  <tr>
+  <thead>
+    <th bgcolor='#5D7176' height="100" style=" text-align: -moz-center; text-align: center; vertical-align: middle;">Groups</th>
+    {% for a in aa %}
+    <th bgcolor='#4D9CB0' height="100" style=" text-align: -moz-center; text-align: center; vertical-align: middle;">{{a|date:'l'}} <br>{{a|date:'d-m-y'}}</th> 
+    {% endfor %}
+  </thead>
+  <tbody>
+  </tr>
+  {% for k,v in dic.items  %}
+  <tr>
+  <td bgcolor="#99CCFF" height:"100" style=' text-align: -moz-center; text-align: center; vertical-align: middle;'>{{k}}</td>
+  <td id="7" bgcolor="#F4F4F0" height:"100" style=' text-align: -moz-center; text-align: center; vertical-align: middle;'> 
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %}
+  			{% if i|date:'l' == 'Sunday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %}  
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td  id="1" height:"100" bgcolor="#F4F4F0" style='text-align: -moz-center; text-align: center; vertical-align: middle'>
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %} 
+  			{% if i|date:'l' == 'Monday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td id="2" height:"100" bgcolor="#F4F4F0" style='text-align: -moz-center; text-align: center; vertical-align: middle'>
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %}
+  			{% if i|date:'l' == 'Tuesday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td  id="3" height:"100" bgcolor="#F4F4F0" style=' text-align: -moz-center; text-align: center; vertical-align: middle '>
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %} 
+  			{% if i|date:'l' == 'Wednesday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td id="4" height:"100" bgcolor="#F4F4F0" style=' text-align: -moz-center; text-align: center; vertical-align: middle '>
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %} 
+  			{% if i|date:'l' == 'Thursday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td id="5" height:"100" bgcolor="#F4F4F0" style=' text-align: -moz-center; text-align: center; vertical-align: middle'>
+  	<div style="width:100%; max-height:100; overflow:auto">
+  		{% for i,j in v.items  %} 
+  			{% if i|date:'l' == 'Friday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+  <td id="6" height="100" bgcolor="#F4F4F0" style=' text-align: -moz-center; text-align: center; vertical-align: middle'>
+  	<div style="width:100%; max-height:100; overflow:auto;">
+  		{% for i,j in v.items  %} 
+  			{% if i|date:'l' == 'Saturday' %}
+  				{% for m in j %}
+  					{{m}}<br>
+				{% endfor %} 
+  			{% endif %}
+   		{% endfor %}
+   	</div>
+   </td>
+ </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+
+<script type="text/javascript">
+function myfunc(){
+	document.getElementById("dates").value=document.getElementById("start_date").value;
+	document.getElementById("myform").submit();
+}
+</script>
+
+</body>
+</html>

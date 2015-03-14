@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CET</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="{{STATIC_URL|default:'/static/'}}css/bootstrap.min.css">
+  <script src="{{STATIC_URL|default:'/static/'}}js/jquery.min.js"></script>
+  <script src="{{STATIC_URL|default:'/static/'}}js/bootstrap.min.js"></script>
+<style type="text/css">
+.bs-example-modal-sm .modal-dialog { /* Edited classname 10/03/2014 */
+    margin-top: 15%;
+    margin-left: 55%;
+    width: 30%
+}
+</style>
+
+</head>
+
+<body>
+<br>
+  <ul class="nav nav-tabs" role="tablist">
+        <li ><a href="/classic_models">Home</a></li>
+        <li ><a href="/classic_models/groups">Groups</a></li>
+        <li class="active"><a href="/classic_models/campaigns">Campaigns</a></li>
+        <li><a href="/classic_models/view_schedule">Campaigns for Groups</a></li>
+      	</ul>
+      	  
+  <div style="font: bold;font-weight: bold;color: navy;font-size: xx-large;">
+  <h1 align="center" style="font-family:fantasy;">Campaigns</h1>
+  </div>   
+<div class="container-fluid">
+  <div class="row" >
+    <div class="col-lg-3">
+    <div class="panel panel-default" >
+	  <div class="panel-heading">
+		<H3 align="center"><b>Existing Campaigns</b></H3>
+	  </div>
+	  <div class="panel-body"  style="overflow:auto;height: auto;max-height: 340px">
+	<form method="post">
+	<div class="btn-group-vertical " style="min-width: 270px;">		
+		{% if campaigns %}
+		{% for e in campaigns %}
+		{% if e %}
+		<button type="submit" id="campaigns" name="campaigns" class="btn btn-default" value= {{ e.campaignID }}>{{ e.campaignName }}</button>
+		{% endif %}
+		{% endfor %}
+		{% else %}
+		<p>No Campaigns found</p>
+		{% endif %}		
+    </div>
+    </form>
+    </div>    
+    <div class="panel-footer" align="center">
+    <button type="button" class="btn btn-primary btn-block btn-sm" name="answer" onclick="showDiv()"><span class="glyphicon glyphicon-plus"></span>&nbsp Create a new Campaign</button>
+   </div>
+   </div>
+    </div>
+	<div class="col-lg-2">
+	</div>
+    <div class="col-lg-7" style="height: 470px;overflow:auto">
+    <form name="myform" id="myform1" method="post">
+    	{% if camp_name %}
+		<div id="Where div"  style="display:block;">
+		{% else %}
+		<div id="Where div"  style="display:none;">
+		{% endif %}
+		<textarea id="groups" name="groups" style="display: none;" ></textarea>
+		<textarea id="dates" name="dates" style="display: none;" ></textarea>
+		{% if camp_name %}
+		<h4>Campaign name: &nbsp <input type='text' id='campaign_name' name="campaign_name" value={{ camp_name }} onchange="myFunction()" required> </h4><br>	
+		<input type='text' id='campid' name="campid" value={{ camp_id }} style="display: none;">
+		{% else %}
+		<h4>Campaign name: &nbsp <input type='text' id='campaign_name' name="campaign_name"  required> </h4><br>
+		<input type='text' id='campid' name="campid" value="" style="display: none;">
+		{% endif %}
+		<button type="button" class="btn btn-info btn-sm" name="answer" data-toggle="modal" data-target=".bs-example-modal-sm" onclick="setempty()"><span class="glyphicon glyphicon-th">&nbsp</span>Add Group</button>
+		<br>		
+			<div class="modal fade bs-example-modal-sm"  tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">			
+			  <div class="modal-dialog modal-sm">
+			    <div class="modal-content " style="padding-left: 5mm;">
+					<h3>Select group for Campaigns:<BR></h3>
+					<select multiple="multiple" name="drpdwn1" size="6" id="drpdwn1[]" required="required">
+					  <option disabled value="selectgroups"> Select Groups </option>
+					  {% if group %}
+					  {% for e in group %}
+					  {% if e %}
+					  <option value={{e.groupID}}> {{ e.groupName }} </option>
+					  {% endif %}
+					  {% endfor %}
+					  {% endif %}
+					</select><br><br>
+					<input type="date" id="start_date" name="start_date" onchange="myfunc()" required="required">
+					
+					<br>
+					<div id="Buttondiv" align="center" style="display:none;">
+					<br><br><a href="javascript:void(0);" class="btn btn-info btn-sm addCF" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-th-list"></span>&nbsp Add</a>
+					</div>
+					<br>
+			    </div>
+			  </div>
+			</div>
+		<br>
+		<div class="panel panel-default" id="table_div" name="table_div" style="max-height:23em; size: auto;;width: 40em">
+		  <div class="panel-heading">
+	    	<h3 class="panel-title"><b>Selected Criteria:</b></h3>
+	  		</div>
+	  		<div class="panel-body">
+    		{% if camp_name %}
+			<table class="table table-hover" id="customFields" name="customFields" style="display: block;max-height: 12.5em;width: 38em; overflow: auto;">
+			{% else %}
+			<table class="table table-hover" id="customFields" name="customFields" style="display: none;max-height: 12.5em;width: 38em; overflow: auto;">
+			{% endif %}
+			
+			<tbody>
+				{% if groups_send %}
+				{% for e in groups_send %}
+				<tr><td>{{ e.groupID }}</td><td>{{ e.startDate|date:'Y-m-d' }}</td> <td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>
+				{% endfor %}
+				{% endif %}
+				
+			</tbody>
+			</table>
+		 </div>
+		 <div class="panel-footer" align="right" id="Buttondiv1"  style="display:none;">
+		<Button type="submit" class="btn btn-success" style="" onclick="somealert();" id="something"><span class="glyphicon glyphicon-ok"> <b>Submit</b></span></Button>			
+		 </div>
+		
+	</div>
+			
+		</div>
+		
+		</form> 
+    </div>
+  </div>
+</div>
+</div>
+<script type="text/javascript">
+var count=0
+$(document).ready(function(){
+	$(".addCF").click(function(){
+		var x=0;
+		var inform=document.forms.myform;
+		for(x=0;x<inform.drpdwn1.length;x++)
+	   	{
+	   	 if(inform.drpdwn1[x].selected)
+	   	 {
+	   		$('#customFields').append("<tr><td>"+inform.drpdwn1[x].value+"</td> <td>"+document.getElementById('start_date').value+"</td>  <td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>")
+	   	 }
+	    }
+		buttondiv1();
+	});
+
+
+$("#customFields").on('click','.remCF',function(){
+    	$(this).parent().parent().parent().remove();
+    	buttondiv1();
+    });
+});
+
+function myFunction(){
+	
+	document.getElementById("Buttondiv1").style.display = 'block';
+}
+
+function somealert()
+{
+	var groups="";
+	var dates="";
+	var table=document.getElementById("customFields");
+	for(var i=0; i<table.rows.length;i++){
+		var str1=table.rows[i].cells[0].innerHTML;
+		var str2=table.rows[i].cells[1].innerHTML;			
+		groups=groups.concat(",",str1);
+		dates=dates.concat(",",str2);
+	}		
+
+		document.getElementById("groups").value=groups;
+		document.getElementById("dates").value=dates
+		document.getElementById("myform1").submit();
+
+		
+}
+function setempty()
+{
+	document.getElementById("drpdwn1[]").val("selectgroups");
+	}
+
+function buttondiv1() {
+	var table=document.getElementById("customFields");
+	var rows = table.rows.length;
+	if(rows>0){
+	document.getElementById("customFields").style.display = 'block';
+	document.getElementById("Buttondiv1").style.display = 'block';
+	document.getElementById("table_div").style.display = 'block';
+	}
+	else{
+	document.getElementById("customFields").style.display = 'none';
+	document.getElementById("Buttondiv1").style.display = 'none';
+	document.getElementById("table_div").style.display = 'none';
+	}
+}
+
+function showDiv() {
+	   document.getElementById('Where div').style.display = "block"
+		   document.getElementById("table_div").style.display = 'none';
+	   document.getElementById("campaign_name").value="";
+	   document.getElementById("campaignid").value="-1";
+	   var table=document.getElementById("customFields");
+	   for(var i=table.rows.length; i>0;i--){
+			table.rows[i-1].remove();
+		}
+	   document.getElementById("drpdwn1[]").value="";	   
+		buttondiv1();
+	}
+function myfunc(){
+	document.getElementById('Buttondiv').style.display = "block"
+}
+</script>
+</body>
+</html>

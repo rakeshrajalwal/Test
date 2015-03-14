@@ -1,0 +1,253 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CET</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="{{STATIC_URL|default:'/static/'}}css/bootstrap.min.css">
+  <script src="{{STATIC_URL|default:'/static/'}}js/jquery.min.js"></script>
+  <script src="{{STATIC_URL|default:'/static/'}}js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" src="{% static 'js/highcharts/highcharts.js' %}"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+<style type="text/css">
+.bs-example-modal-sm .modal-dialog { /* Edited classname 10/03/2014 */
+    margin-top: 15%;
+    margin-left: 55%;
+    width: 30%
+}
+</style>
+</head>
+<body onload='enable()'>
+<br>
+  <ul class="nav nav-tabs" role="tablist">
+        <li ><a href="/classic_models">Home</a></li>
+        <li ><a href="/classic_models/groups">Groups</a></li>
+        <li><a href="/classic_models/campaigns">Campaigns</a></li>
+        <li><a href="/classic_models/view_schedule">Campaigns for Groups</a></li>
+  </ul>
+  <div style="font: bold;font-weight: bold;color: navy;font-size: large;">
+  	<h1 align="left" style="font-family:fantasy;">Campaign Analysis</h1>
+  </div>
+  <div class="container-fluid">
+  	<div class="row" >
+    	<div class="row-lg-3">
+    		<div class="panel panel-default" >
+	  			<div class="panel-body" style="background:#F5F5F0">
+  						<div id="left" style="width:50%; float:left">
+     						<div id="object1">Increase in: <select>
+  									<option value="Deposits">Deposits</option>
+  									<option value="GGR">GGR</option>
+									</select>
+							</div>
+     						<div id="object2">Increase per customer: </div>
+	 						<div id="object3">Start Date: {% for e in date %}
+										{% if e %}
+										<font color="blue">{{ e.start_date }}</font>
+										{% endif %}
+										{% endfor %} 
+							</div>
+	 						<div id="object4">Start Date: {% for e in date %}
+										{% if e %}
+										<font color="blue">{{ e.start_date }}</font>
+										{% endif %}
+										{% endfor %} 
+							</div>
+  						</div>
+
+  						<div id="right" style="width:50%; float:right">
+     						<div id="object5">Group: {% for e in date %}
+													 {% if e %}
+										  			 <font color="blue">{{ e.target_group }}</font>
+													 {% endif %}
+													 {% endfor %} </div>
+     						<div id="object6">Campaign: {% for e in camp_name %}
+													 {% if e %}
+										  			 <font color="blue">{{ e.campaign_name }}</font>
+													 {% endif %}
+													 {% endfor %}</div>
+	 						<div id="object7">Execution Method: <font color="blue">Silver Pop</font> </div>
+  						</div>
+	  			</div>
+    		</div>
+		</div>
+  	</div>  
+  </div>
+  &nbsp;&nbsp;&nbsp;&nbsp;Analysis Measure: <select id='purpose'> <option value="0"  selected>Deposits</option>
+  							 <option value="1">GGR</option>
+  					</select>
+  <br><br>
+  <div>
+  <div class="col-lg-5" style='display:none;' id='business1'>
+  <table class="table table-bordered table-hover">
+  	<thead>
+  		<tr>
+  			<th> </th>
+  			<th>Test</th>
+  			<th>Control</th>
+  		</tr>
+  	</thead>
+  	<tbody>
+  		<tr><td>Group Size</td><td>{{ targetgroupsize }}</td><td>{{ controlgroupsize }}</td></tr>
+  		<tr><td># of Customers Who Deposited</td><td>{{ targetplayersize }}</td><td>{{ controlplayersize }}</td></tr>
+  		<tr><td>% of Customers Who Deposited</td><td>{{ targetpercentage }}</td><td>{{ controlpercentage }}</td></tr>
+  		<tr><td>Average Deposit</td><td>{{ targetavgdeposit }}</td><td>{{ controlavgdeposit }}</td></tr>
+  	</tbody>
+</table>
+<div id="container" style="width: 500px; height: 300px; margin: 0"></div>
+</div>
+<div class="col-lg-5" style='display:none;' id='business2'>
+  <table class="table table-bordered table-hover">
+  	<thead>
+  		<tr>
+  			<th> </th>
+  			<th>Test</th>
+  			<th>Control</th>
+  		</tr>
+  	</thead>
+  	<tbody>
+  		<tr><td>Group Size</td><td>{{ targetgroupsize }}</td><td>{{ controlgroupsize }}</td></tr>
+  		<tr><td># of Customers (GGR)</td><td>{{ ggrtargetplayersize }}</td><td>{{ ggrcontrolplayersize }}</td></tr>
+  		<tr><td>% of Customers (GGR)</td><td>{{ ggrtargetpercentage }}</td><td>{{ ggrcontrolpercentage }}</td></tr>
+  		<tr><td>Average GGR</td><td>{{ ggrtargetavgdeposit }}</td><td>{{ ggrcontrolavgdeposit }}</td></tr>
+  	</tbody>
+</table>
+<div id="container1" style="width: 500px; height: 300px; margin: 0"></div>
+</div>
+<div class="col-lg-7" style="overflow:auto;height: auto;max-height: 480px">
+<table class="table table-bordered table-hover">
+<thead>
+<tr>
+	<th>wh_player_id</th>
+	<th>Deposit Amount</th>
+	<th>Net GGR Amount</th>
+</tr>
+</thead>
+<tbody>
+{% for i in  playerid %}
+<tr>
+{% for k in i %}
+<td>{{k}} &nbsp</td>
+{% endfor %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#container').highcharts({
+        	 title: {
+                 text: '% of Customers Deposited',
+                 x: -20 //center
+             },
+             subtitle: {
+                 text: 'Source: WorldClimate.com',
+                 x: -20
+             },
+             xAxis: {
+                 categories:['{{dategraph|join:"','" }}']
+             },
+             yAxis: {
+                 title: {
+                     text: 'Temperature (°C)'
+                 },
+                 plotLines: [{
+                     value: 0,
+                     width: 1,
+                     color: '#808080'
+                 }]
+             },
+             tooltip: {
+                 valueSuffix: '°C'
+             },
+             legend: {
+                 layout: 'vertical',
+                 align: 'right',
+                 verticalAlign: 'middle',
+                 borderWidth: 0
+             },
+             series: [{
+                 name: 'Target',
+                 data: [{{ targetgraph|join:"," }}]
+             }, {
+                 name: 'Control',
+                 data: [{{ controlgraph|join:"," }}]
+             }]
+        });
+    });
+    </script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#container1').highcharts({
+        	 title: {
+                 text: '% of Customers GGR',
+                 x: -20 //center
+             },
+             subtitle: {
+                 text: 'Source: WorldClimate.com',
+                 x: -20
+             },
+             xAxis: {
+                 categories:['{{dategraph|join:"','" }}']
+             },
+             yAxis: {
+                 title: {
+                     text: 'Temperature (°C)'
+                 },
+                 plotLines: [{
+                     value: 0,
+                     width: 1,
+                     color: '#808080'
+                 }]
+             },
+             tooltip: {
+                 valueSuffix: '°C'
+             },
+             legend: {
+                 layout: 'vertical',
+                 align: 'right',
+                 verticalAlign: 'middle',
+                 borderWidth: 0
+             },
+             series: [{
+                 name: 'Target',
+                 data: [{{ targetgraph|join:"," }}]
+             }, {
+                 name: 'Control',
+                 data: [{{ controlgraph|join:"," }}]
+             }]
+        });
+    });
+    </script>
+
+
+    <script>
+    
+    function enable()
+    {
+    	 $("#business1").show();
+         $("#business2").hide();
+    }
+    $(document).ready(function(){
+    	
+    	$('#purpose').on('change', function() {
+          if ( this.value == '0')
+          {
+            $("#business1").show();
+            $("#business2").hide();
+          }
+          else
+          {
+            $("#business2").show();
+            $("#business1").hide();
+          }
+        });
+    });
+    </script>
+</body>
+</html>

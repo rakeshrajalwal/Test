@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CET</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="{{STATIC_URL|default:'/static/'}}css/bootstrap.min.css">
+  <script src="{{STATIC_URL|default:'/static/'}}js/jquery.min.js"></script>
+  <script src="{{STATIC_URL|default:'/static/'}}js/bootstrap.min.js"></script>
+<style type="text/css">
+.bs-example-modal-sm .modal-dialog { /* Edited classname 10/03/2014 */
+    margin-top: 15%;
+    margin-left: 55%;
+    width: 30%
+}
+</style>
+
+</head>
+
+<body>
+<br>
+  <ul class="nav nav-tabs" role="tablist">
+        <li ><a href="/classic_models">Home</a></li>
+        <li class="active"><a>Groups</a></li>
+        <li><a href="/classic_models/campaigns">Campaigns</a></li>
+        <li><a href="/classic_models/view_schedule">Campaigns for Groups</a></li>
+      	</ul>
+      	  
+  <div style="font: bold;font-weight: bold;color: navy;font-size: xx-large;">
+  <h1 align="center" style="font-family:fantasy;">Customer Groups</h1>
+  </div>   
+<div class="container-fluid">
+  <div class="row" >
+    <div class="col-lg-3">
+    <div class="panel panel-default" >
+	  <div class="panel-heading">
+		<H3 align="center"><b>Existing Groups</b></H3>
+	  </div>
+	  <div class="panel-body"  style="overflow:auto;height: auto;max-height: 340px">
+	<form method="post">
+	<div class="btn-group-vertical " style="min-width: 270px;">		
+		{% if group %}
+		{% for e in group %}
+		{% if e %}
+		<button type="submit" id="groups" name="groups" class="btn btn-default" value= {{ e.groupID }} >{{ e.groupName }}</button>		
+		{% endif %}
+		{% endfor %}
+		{% else %}
+		<p>No Groups found</p>
+		{% endif %}		
+    
+    </div>
+    </form>
+    </div>
+    
+    <div class="panel-footer" align="center">
+    <button type="button" class="btn btn-primary btn-block btn-sm" name="answer" onclick="showDiv()"><span class="glyphicon glyphicon-plus"></span>&nbsp Create a new Customer Group</button>
+   </div>
+   </div>
+    </div>
+	<div class="col-lg-2">
+	</div>
+    <div class="col-lg-7" style="height: 470px;overflow:auto">
+    <form name="myform" method="post" >
+    	{% if grp_name %}
+		<div id="Where div"  style="display:block;">
+		{% else %}
+		<div id="Where div"  style="display:none;">
+		{% endif %}
+		<textarea id="cities" name="cities" style="display: none;" ></textarea>
+		<textarea id="countries" name="countries" style="display: none;" ></textarea>
+		<textarea id="creditlimits" name="creditlimits" style="display: none;" ></textarea>
+		<textarea id="empNos" name="empNos" style="display: none;" ></textarea>
+		{% if grp_name %}
+		<h4>Group name: &nbsp <input type='text' id='group_name' name="group_name" value={{ grp_name }} onchange="myFunction()" required> </h4><br>	
+		<input type='text' id='groupid' name="groupid" value={{ grp_id }} style="display: none;">
+		{% else %}
+		<h4>Group name: &nbsp <input type='text' id='group_name' name="group_name"  required> </h4><br>
+		<input type='text' id='groupid' name="groupid" value="" style="display: none;">
+		{% endif %}
+		<button type="button" class="btn btn-info btn-sm" name="answer" data-toggle="modal" data-target=".bs-example-modal-sm" onclick="setempty()"><span class="glyphicon glyphicon-th">&nbsp</span>Add Criteria</button>
+		<br>		
+			<div class="modal fade bs-example-modal-sm"  tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">			
+			  <div class="modal-dialog modal-sm">
+			    <div class="modal-content " style="padding-left: 5mm;">
+					<h3>Select the criteria for the group:<BR></h3>
+					<input type="radio" name="BasedOn" value="City"  onclick="showDiv1()">City
+					<br>
+					<input type="radio" name="BasedOn" value="Country" onclick="showDiv1()">Country
+					<br>
+					<input type="radio" name="BasedOn" value="Credit" onclick="showDiv1()">Credit Limit
+					<br>
+					<input type="radio" name="BasedOn" value="EmpNo" onclick="showDiv1()">Sales Rep Emp No
+					
+					
+					<h5>
+					<div id="Citydiv"  style="display:none;" >
+					<br>City: &nbsp <input type='text' id='city' name="city" >
+					</div>
+					
+					<div id="Countrydiv"  style="display:none;">
+					<br>Country: &nbsp <input type='text' id='country' name="country" >
+					</div>
+					
+					<div id="Creditdiv"  style="display:none;">
+					<br>Credit Limit: &nbsp <input type='text' id='credit_limit' name="credit_limit">
+					</div>
+					
+					<div id="EmpNodiv"  style="display:none;">
+					<br>Sales Rep Emp No: &nbsp <input type='text' id='emp_number' name="emp_number">
+					</div>
+					
+					<div id="Buttondiv"  style="display:none;">
+					<br><br><a href="javascript:void(0);" class="btn btn-info btn-sm addCF" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-th-list"></span>&nbsp Add</a>
+					</div>
+					</h5>      
+			    </div>
+			  </div>
+			</div>
+		<br>
+		<div class="panel panel-default" id="table_div" name="table_div" style="max-height:23em; size: auto;;width: 40em">
+		  <div class="panel-heading">
+	    	<h3 class="panel-title"><b>Selected Criteria:</b></h3>
+	  		</div>
+	  		<div class="panel-body">
+    		{% if grp_name %}
+			<table class="table table-hover" id="customFields" name="customFields" style="display: block;max-height: 12.5em;width: 38em; overflow: auto;">
+			{% else %}
+			<table class="table table-hover" id="customFields" name="customFields" style="display: none;max-height: 12.5em;width: 38em; overflow: auto;">
+			{% endif %}
+			
+			<tbody>
+				{% if cities_send %}
+				{% for e in cities_send %}
+				<tr><td>City</td> <td> <input type='text' id='txtName' disabled value=  {{ e }}></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td><td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>
+				{% endfor %}
+				{% endif %}
+				
+				{% if countries_send %}
+				{% for e in countries_send %}
+				<tr><td>Country</td> <td> <input type='text' id='txtName' disabled value=  {{ e }}></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td><td><span class='label '> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>
+				{% endfor %}
+				{% endif %}
+				
+				{% if credit_send %}
+				<tr><td>CreditLimit</td> <td> <input type='text' id='txtName' disabled value=  {{ credit_send }}></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td><td><span class='label '> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>
+				{% endif %}
+
+				{% if emp_no_send %}
+				{% for e in emp_no_send %}
+				<tr><td>SalesRepEmpNo</td> <td> <input type='text' id='txtName' disabled value=  {{ e }}></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td><td><span class=' label '> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>
+				{% endfor %}
+				{% endif %}
+			</tbody>
+			</table>
+		 </div>
+		 <div class="panel-footer" align="right" id="Buttondiv1"  style="display:none;">
+		<Button type="submit" class="btn btn-success" style="" onclick="somealert()"><span class="glyphicon glyphicon-ok"> <b>Submit</b></span></Button>			
+		 </div>
+		
+	</div>
+			
+		</div>
+		
+		</form> 
+    </div>
+  </div>
+</div>
+</div>
+<script type="text/javascript">
+var count=0
+$(document).ready(function(){
+	$(".addCF").click(function(){
+		
+		if(document.myform.BasedOn[0].checked == true){
+			$('#customFields').append("<tr><td>City</td> <td> <input type='text' id='txtName' disabled value=  '"+ document.getElementById('city').value +"'></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td><td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>")
+		}
+		
+		else if(document.myform.BasedOn[1].checked == true){
+			$('#customFields').append("<tr><td>Country</td> <td><input type='text' id='txtName' disabled value=  '"+ document.getElementById('country').value +"'></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td> <td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>")
+		}
+		
+		else if(document.myform.BasedOn[2].checked == true){
+			$('#customFields').append("<tr><td>CreditLimit</td>  <td><input type='text' id='txtName' disabled value=  '"+ document.getElementById('credit_limit').value +"'></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td> <td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td></tr>")
+		}
+		
+		else if(document.myform.BasedOn[3].checked == true){
+			$('#customFields').append("<tr'><td>SalesRepEmpNo</td> <td><input type='text' id='txtName' disabled value=  '"+ document.getElementById('emp_number').value +"'></td> <td><button type='button' hidden class='applyCF'>Apply</button></td> <td><span class='label'> <a href='javascript:void(0);' class='editCF'>Edit</a></span></td> <td><span class='label'> <a href='javascript:void(0);' class='remCF'>Remove</a></span></td> </tr>")
+		}
+		buttondiv1();
+	});
+
+
+$("#customFields").on('click','.editCF',function(){
+	
+	$(this).parent().parent().parent().find("input[type=text]").attr('disabled', false);
+	$(this).parent().parent().parent().find("button[type=button]").attr('hidden', false);
+	});
+
+$("#customFields").on('click','.applyCF',function(){
+	var par = $(this).parent().parent(); 
+	var Cri_val = par.children("td:nth-child(2)");
+	Cri_val.html("<input type='text' id='txtName' value='"+$(this).parent().parent().find("input[type=text]").val()+"'/>");
+	$(this).parent().parent().find("input[type=text]").attr('disabled', true);
+	$(this).parent().parent().find("button[type=button]").attr('hidden', true);	
+	document.getElementById("Buttondiv1").style.display = 'block';
+	});
+
+
+$("#customFields").on('click','.remCF',function(){
+    	$(this).parent().parent().parent().remove();
+    	buttondiv1();
+    });
+});
+
+function myFunction(){
+	
+	document.getElementById("Buttondiv1").style.display = 'block';
+}
+
+function somealert()
+{
+	var cities="";
+	var countries="";
+	var creditlimits=0;
+	var empNos="";
+	var table=document.getElementById("customFields");
+	for(var i=0; i<table.rows.length;i++){
+		var str1=table.rows[i].cells[0].innerHTML;
+		var str2=table.rows[i].cells[1].children[0].value;		
+		if(str1=="City"){
+			cities=cities.concat(",",str2);
+		}
+		else if(str1=="Country"){
+			countries=countries.concat(",",str2)
+		}
+		else if(str1=="CreditLimit"){
+			var cred=table.rows[i].cells[1].children[0].value;
+			if(cred>creditlimits)
+				creditlimits=cred;
+		}
+		else if(str1=="SalesRepEmpNo")
+			empNos=empNos.concat(",",str2)
+	}
+		
+		document.getElementById("cities").value=cities;
+		document.getElementById("countries").value=countries;
+		document.getElementById("creditlimits").value=creditlimits;
+		document.getElementById("empNos").value=empNos;
+}
+function setempty()
+{
+	document.getElementById("city").value="";
+	document.getElementById("country").value="";
+	document.getElementById("credit_limit").value="";
+	document.getElementById("emp_number").value="";
+}
+
+function buttondiv1() {
+	var table=document.getElementById("customFields");
+	var rows = table.rows.length;
+	if(rows>0){
+	document.getElementById("customFields").style.display = 'block';
+	document.getElementById("Buttondiv1").style.display = 'block';
+	document.getElementById("table_div").style.display = 'block';
+	}
+	else{
+	document.getElementById("customFields").style.display = 'none';
+	document.getElementById("Buttondiv1").style.display = 'none';
+	document.getElementById("table_div").style.display = 'none';
+	}
+}
+
+function showDiv() {
+	   document.getElementById('Where div').style.display = "block"
+		   document.getElementById("table_div").style.display = 'none';
+	   document.getElementById("group_name").value="";
+	   document.getElementById("groupid").value="";
+	   var table=document.getElementById("customFields");
+	   for(var i=table.rows.length; i>0;i--){
+			table.rows[i-1].remove();
+		}
+	}
+function buttonDiv() {
+	if(document.myform.BasedOn[0].checked == true || document.myform.BasedOn[1].checked == true ||
+			document.myform.BasedOn[2].checked == true || document.myform.BasedOn[3].checked == true){
+	   document.getElementById('Buttondiv').style.display = "block"
+		}
+	else{
+		document.getElementById('Buttondiv').style.display = "none"
+	}
+	}
+
+function showDiv1() {
+	buttonDiv();
+	if(document.myform.BasedOn[0].checked == true){
+		document.getElementById('Citydiv').style.display = "block"
+		
+	}
+	else
+	{document.getElementById('Citydiv').style.display = "none"}
+	
+	if(document.myform.BasedOn[1].checked == true){
+	   document.getElementById('Countrydiv').style.display = "block"
+	}
+	else
+	{document.getElementById('Countrydiv').style.display = "none"}
+	
+	if(document.myform.BasedOn[2].checked == true){
+		   document.getElementById('Creditdiv').style.display = "block"	   
+	}
+	else
+	{document.getElementById('Creditdiv').style.display = "none"}
+	
+	if(document.myform.BasedOn[3].checked == true){
+		   document.getElementById('EmpNodiv').style.display = "block"
+		}
+	else
+	{document.getElementById('EmpNodiv').style.display = "none"}
+	}
+</script>
+</body>
+</html>
